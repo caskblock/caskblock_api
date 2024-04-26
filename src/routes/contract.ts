@@ -7,13 +7,12 @@ export async function postContract(req: Request, res: Response) {
   const handleDeployContract = async (): Promise<void> => {
 
     const account = await config.getActorAccount();
-
+  
     const response = await execute(
-        //because no contract factory id is provided it defaults to 'mintspace2.testnet'
         {account},
         deployContract({
-        factoryContractId: 'mintspace3.testnet',
-        name: 'secondMintbaseV2',
+        factoryContractId: process.env["FACTORY_CONTRACT_ID"] ?? 'mintspace2.testnet',
+        name: req.body.contractName,
         ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? 'finalmintbaseaccount.testnet',
         metadata: {
             symbol: ""
