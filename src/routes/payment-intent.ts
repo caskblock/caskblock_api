@@ -7,7 +7,7 @@ import {
   calculateCostUsdcents,
   isMintbaseContractCall,
   isObject,
-} from "common";
+} from "../common";
 
 export async function postPaymentIntent(req: Request, res: Response) {
   console.log(
