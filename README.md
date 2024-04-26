@@ -5,6 +5,8 @@
 - USDC_ADDRESS=usdc.fakes.testnet
 - NEAR_NETWORK=testnet
 - FACTORY_CONTRACT_ID=mintspace3.testnet
+- STRIPE_SECRET_KEY=STRIPE_SECRET_KEY
+- STRIBE_WEBHOOK_SECRET=STRIPE_WEBHOOK_SECRET
 
 ###### Generate account and export secret key, then add the following to the env vars:
 
