@@ -3,7 +3,7 @@ import { execute } from "@mintbase-js/sdk";
 
 import config from "../config";
 import { Account } from "near-api-js";
-import { calculateCostUsdcents, isMintbaseContractCall } from "common";
+import { calculateCostUsdcents, isMintbaseContractCall } from "../common";
 
 export async function postStripeWebhook(req: Request, res: Response) {
   console.log(`Received webhook POST: ${req.body}`);

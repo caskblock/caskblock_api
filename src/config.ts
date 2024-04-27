@@ -8,7 +8,7 @@ import Stripe from "stripe";
 
 dotenv.config();
 
-const portEnv = process.env.PORT || "8080";
+const portEnv = process.env.PORT || "8888";
 
 async function connect(
   accountId: string,
