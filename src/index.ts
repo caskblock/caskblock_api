@@ -4,10 +4,9 @@ import cors from "cors";
 import config from "./config";
 // import { postPaymentIntent } from "./routes/payment-intent";
 // import { postStripeWebhook } from "./routes/stripe-webhook";
-import { postContract } from "./routes/contract";
-import { postMetadata } from "./routes/metadata";
-import { listProducts } from "./routes/listProducts";
-import { postOrder } from "./routes/orders";
+import { postContract, postMetadata } from "./routes/admin";
+import { listProducts } from "./routes/products";
+import { postOrder }    from "./routes/orders";
 
 // maybe switch to basic authentication in the future
 const validateKey = (req: Request, res: Response, next: NextFunction) => {
