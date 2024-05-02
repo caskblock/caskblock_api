@@ -6,6 +6,7 @@ import { postPaymentIntent } from "./routes/payment-intent";
 import { postStripeWebhook } from "./routes/stripe-webhook";
 import { postContract } from "./routes/contract";
 import { postMetadata } from "./routes/metadata";
+import { listProducts } from "./routes/listProducts";
 
 // maybe switch to basic authentication in the future
 const validateKey = (req: Request, res: Response, next: NextFunction) => {
@@ -22,8 +23,10 @@ app.use(cors());
 app.get("/health", (_: Request, res: Response) => {
   res.status(200).send("Service is healthy");
 });
+
 app.post("/payment-intent", express.json(), postPaymentIntent);
 app.post("/stripe-webhook", express.text({ type: "*/*" }), postStripeWebhook);
+app.get("/products", express.json(), listProducts);
 
 const adminRouter = express.Router();
 adminRouter.post("/contract", validateKey, express.json(), postContract);
