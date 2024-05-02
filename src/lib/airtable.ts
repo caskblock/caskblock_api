@@ -5,6 +5,7 @@ export interface Product {
   title?: string;
   description?: string;
   media?: string;
+  price?: number;
   copies?: number;
   issued_at?: string;
   expires_at?: string;
@@ -26,12 +27,13 @@ export async function getProductData(base: any, id: string): Promise<Product> {
 
       if (record) {
         // Extract relevant fields from the record
-        const { Name, Description, Supply } = record.fields;
+        const { Name, Description, Price, Supply } = record.fields;
         // Build object
         const metadata: Product = {
           title: Name,
           description: Description,
           copies: Supply,
+          price: Price
         };
 
         resolve(metadata); // Return metadata;

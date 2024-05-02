@@ -20,17 +20,19 @@ export async function postMetadata(req: Request, res: Response) {
                 },
             noReference: true,
             maxSupply: metadata.copies,
-            price: 1,
-            ftAddress: process.env["USDC_ADDRESS"],
+            price: metadata.price,
+            // ftAddress: process.env["USDC_ADDRESS"],
+            // ftDecimals: 6,
         })
 
     );
 
-    console.log('Metadata created successfully');
-    console.log(response);
+    if (response && "receipts_outcome" in response){
+      const logReceipt = response.receipts_outcome[0].outcome.logs[0];
+      const log = JSON.parse(logReceipt.substring(11));
+      const metdataID = log.data.metadata_id;
+      return metdataID;
 
-    if (response && "receipts_outcome" in response && "metadata" in response.receipts_outcome[0].outcome) {
-      return response?.receipts_outcome?.[0]?.outcome?.metadata?.metadata_id ?? null;
     } else {
       // Handle the case where the response does not have a result property
       // For example, you can throw an error or return a default value
@@ -38,10 +40,14 @@ export async function postMetadata(req: Request, res: Response) {
     }
   };
 
-  const productID = 'recc4xnr0fPuuRTck';
+  const productID = req.query.productID as string;
   const base = await initAirtable();
   const metadata = await getProductData(base, productID)
   const metadataID = await handleCreateMetadata(metadata);
-  // updateProductStatus(base, productID, "0");
-  res.status(200).send();
+  updateProductStatus(base, productID, metadataID);
+  res.status(200).send({
+    message: `Metadata created successfully for '${metadata.title}'`,
+    metadataID: metadataID
+  }
+  );
 }
