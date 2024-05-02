@@ -2,11 +2,12 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 
 import config from "./config";
-import { postPaymentIntent } from "./routes/payment-intent";
-import { postStripeWebhook } from "./routes/stripe-webhook";
+// import { postPaymentIntent } from "./routes/payment-intent";
+// import { postStripeWebhook } from "./routes/stripe-webhook";
 import { postContract } from "./routes/contract";
 import { postMetadata } from "./routes/metadata";
 import { listProducts } from "./routes/listProducts";
+import { postOrder } from "./routes/orders";
 
 // maybe switch to basic authentication in the future
 const validateKey = (req: Request, res: Response, next: NextFunction) => {
@@ -24,9 +25,10 @@ app.get("/health", (_: Request, res: Response) => {
   res.status(200).send("Service is healthy");
 });
 
-app.post("/payment-intent", express.json(), postPaymentIntent);
-app.post("/stripe-webhook", express.text({ type: "*/*" }), postStripeWebhook);
+// app.post("/payment-intent", express.json(), postPaymentIntent);
+// app.post("/stripe-webhook", express.text({ type: "*/*" }), postStripeWebhook);
 app.get("/products", express.json(), listProducts);
+app.post("/orders", express.json(), postOrder);
 
 const adminRouter = express.Router();
 adminRouter.post("/contract", validateKey, express.json(), postContract);

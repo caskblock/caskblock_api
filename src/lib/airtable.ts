@@ -32,7 +32,7 @@ function buildProduct(record: any) {
 
 export async function getProductData(base: any, id: string): Promise<Product> {
   return new Promise((resolve, reject) => {
-    base(process.env["AIRTABLE_TABLE_NAME"]).find(id, (err: any, record : any) => {
+    base(process.env["AIRTABLE_PRODUCTS"]).find(id, (err: any, record : any) => {
       if (err) {
         console.error('Error querying record:', err);
         return;
@@ -53,7 +53,7 @@ export async function getProductData(base: any, id: string): Promise<Product> {
 
 export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
 
-  base(process.env["AIRTABLE_TABLE_NAME"]).update(id, {
+  base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
     Status: 'Published',
     MetadataID: metadataID
 
@@ -70,7 +70,7 @@ export async function listPublishedProducts(base: any): Promise<Product[]> {
   return new Promise((resolve, reject) => {
     const publishedProducts: Product[] = [];
 
-    base(process.env["AIRTABLE_TABLE_NAME"]).select({
+    base(process.env["AIRTABLE_PRODUCTS"]).select({
       view: "Published"
     }).eachPage((page: any, fetchNextPage: any) => {
 
@@ -93,3 +93,17 @@ export async function listPublishedProducts(base: any): Promise<Product[]> {
   });
 }
 
+export async function createOrder(base: any, tokenID: string, name: string, email: string, walletAddress: string): Promise<void> {
+  base(process.env["AIRTABLE_ORDERS"]).create({
+    TokenID: tokenID,
+    Name: name,
+    Email: email,
+    WalletAddress: walletAddress
+  }, (err: any) => {
+    if (err) {
+      console.error('Error creating record:', err);
+      return;
+    }
+    console.log('Record created successfully');
+  });
+}
