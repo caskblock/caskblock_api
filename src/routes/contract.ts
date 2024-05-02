@@ -7,12 +7,12 @@ export async function postContract(req: Request, res: Response) {
   const handleDeployContract = async (): Promise<void> => {
 
     const account = await config.getActorAccount();
-  
+
     const response = await execute(
         {account},
         deployContract({
         factoryContractId: process.env["FACTORY_CONTRACT_ID"] ?? 'mintspace2.testnet',
-        name: req.body.contractName,
+        name: req.body.contractName ?? 'jinkanfts',
         ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? 'finalmintbaseaccount.testnet',
         metadata: {
             symbol: ""
@@ -22,7 +22,6 @@ export async function postContract(req: Request, res: Response) {
 
     console.log("response", response);
   }
-
 
   handleDeployContract()
   res.status(200).send();
