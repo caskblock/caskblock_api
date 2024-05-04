@@ -11,6 +11,7 @@ export interface Product {
   expires_at?: string;
   starts_at?: string;
   status?: string;
+  metadataId?: string;
 }
 
 export function initAirtable() {
@@ -18,13 +19,16 @@ export function initAirtable() {
 }
 
 function buildProduct(record: any) {
-  const { Name, Description, Price, Supply } = record.fields;
 
+  const { Name, Description, Price, Supply, Image, MetadataID } = record.fields;
+  
   const metadata: Product = {
     title: Name,
     description: Description,
     copies: Supply,
-    price: Price
+    price: Price,
+    media: Image[0].url,
+    metadataId: MetadataID
   };
 
   return metadata;
