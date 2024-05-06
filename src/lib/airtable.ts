@@ -2,6 +2,7 @@ import Airtable from 'airtable';
 
 // Define interface for the record
 export interface Product {
+  id?: string;
   title?: string;
   description?: string;
   media?: string;
@@ -23,6 +24,7 @@ function buildProduct(record: any) {
   const { Name, Description, Price, Supply, Image, MetadataID } = record.fields;
   
   const metadata: Product = {
+    id: record.id,
     title: Name,
     description: Description,
     copies: Supply,
@@ -97,12 +99,13 @@ export async function listPublishedProducts(base: any): Promise<Product[]> {
   });
 }
 
-export async function createOrder(base: any, tokenID: string, name: string, email: string, walletAddress: string): Promise<void> {
+export async function createOrder(base: any, tokenID: string, name: string, email: string, walletAddress: string, transactionHx: string): Promise<void> {
   base(process.env["AIRTABLE_ORDERS"]).create({
     TokenID: tokenID,
     Name: name,
     Email: email,
-    WalletAddress: walletAddress
+    WalletAddress: walletAddress,
+    TransactionHx: transactionHx,
   }, (err: any) => {
     if (err) {
       console.error('Error creating record:', err);
