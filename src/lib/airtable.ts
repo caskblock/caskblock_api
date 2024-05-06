@@ -2,6 +2,7 @@ import Airtable from 'airtable';
 
 // Define interface for the record
 export interface Product {
+  id?: string;
   title?: string;
   description?: string;
   media?: string;
@@ -23,6 +24,7 @@ function buildProduct(record: any) {
   const { Name, Description, Price, Supply, Image, MetadataID } = record.fields;
   
   const metadata: Product = {
+    id: record.id,
     title: Name,
     description: Description,
     copies: Supply,

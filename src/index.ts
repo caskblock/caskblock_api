@@ -7,6 +7,7 @@ import config from "./config";
 import { postContract, postMetadata } from "./routes/admin";
 import { listProducts } from "./routes/products";
 import { postOrder }    from "./routes/orders";
+import { showProduct } from "./routes/product";
 
 // maybe switch to basic authentication in the future
 const validateKey = (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +27,7 @@ app.get("/health", (_: Request, res: Response) => {
 
 // app.post("/payment-intent", express.json(), postPaymentIntent);
 // app.post("/stripe-webhook", express.text({ type: "*/*" }), postStripeWebhook);
+app.get("/product/:id", express.json(), showProduct);
 app.get("/products", express.json(), listProducts);
 app.post("/orders", express.json(), postOrder);
 
