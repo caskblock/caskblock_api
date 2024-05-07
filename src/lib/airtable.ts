@@ -1,4 +1,6 @@
 import Airtable from 'airtable';
+var cache = require('memory-cache');
+const PRODUCTS_KEY = 'products';
 
 // Define interface for the record
 export interface Product {
@@ -20,9 +22,8 @@ export function initAirtable() {
 }
 
 function buildProduct(record: any) {
-
   const { Name, Description, Price, Supply, Image, MetadataID } = record.fields;
-  
+
   const metadata: Product = {
     id: record.id,
     title: Name,
@@ -37,6 +38,12 @@ function buildProduct(record: any) {
 }
 
 export async function getProductData(base: any, id: string): Promise<Product> {
+  const cachedProducts = cache.get(PRODUCTS_KEY);
+
+  if (cachedProducts) {
+    return cachedProducts.find((product: Product) => product.id === id);
+  }
+
   return new Promise((resolve, reject) => {
     base(process.env["AIRTABLE_PRODUCTS"]).find(id, (err: any, record : any) => {
       if (err) {
@@ -58,7 +65,6 @@ export async function getProductData(base: any, id: string): Promise<Product> {
 }
 
 export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
-
   base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
     Status: 'Published',
     MetadataID: metadataID
@@ -69,10 +75,18 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
       return;
     }
     console.log('Record updated successfully');
+
+    cache.del(PRODUCTS_KEY);
   });
 }
 
 export async function listPublishedProducts(base: any): Promise<Product[]> {
+  const cachedProducts = cache.get(PRODUCTS_KEY);
+
+  if (cachedProducts) {
+    return cachedProducts;
+  }
+
   return new Promise((resolve, reject) => {
     const publishedProducts: Product[] = [];
 
@@ -93,6 +107,8 @@ export async function listPublishedProducts(base: any): Promise<Product[]> {
         reject(err); // Reject the promise if there's an error
         return;
       }
+
+      cache.put(PRODUCTS_KEY, publishedProducts);
 
       resolve(publishedProducts);
     });
