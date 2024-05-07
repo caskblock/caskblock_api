@@ -21,10 +21,10 @@
   dependencies:
     graphql-request "^5.0.0"
 
-"@mintbase-js/sdk@0.6.0-beta-prerelease.3":
-  version "0.6.0-beta-prerelease.3"
-  resolved "https://registry.yarnpkg.com/@mintbase-js/sdk/-/sdk-0.6.0-beta-prerelease.3.tgz#fce09ef0f13b2b3b746ef0f63a88bdb2c595c9b0"
-  integrity sha512-7V4kkl47//g8+uoTDgBPRBZsd4xI5LIU5WnuMp0Dm2DLN49RZ0QeJY3n3rgtEoVDQeFtfyNqKVp7izssQ3Ji3w==
+"@mintbase-js/sdk@0.6.0-beta-prerelease.5":
+  version "0.6.0-beta-prerelease.5"
+  resolved "https://registry.yarnpkg.com/@mintbase-js/sdk/-/sdk-0.6.0-beta-prerelease.5.tgz#bea218c408edc3a3aa04a7676b73850622edde39"
+  integrity sha512-eGSt/xRyq1wmj4ANSgTDqbNBu0ernhldBUxrhvSi9T0HuCy0jlXrsUS6VWtxgOHFIEqnuqUTXh+fxpqKgJWXoA==
   dependencies:
     bn.js "5.2.1"
     near-api-js "^2.1.4"

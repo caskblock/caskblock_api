@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { execute, createMetadata, deployContract } from '@mintbase-js/sdk';
+import { execute, createMetadata, deployContract, ftDepositStorage } from '@mintbase-js/sdk';
 import { Product, initAirtable, getProductData, updateProductStatus } from '../lib/airtable';
 import config from "../config";
 
@@ -9,10 +9,10 @@ export async function postContract(req: Request, res: Response) {
 
     const account = await config.getActorAccount();
 
-    const response = await execute(
+    const deployResponse = await execute(
         {account},
         deployContract({
-          factoryContractId: process.env["FACTORY_CONTRACT_ID"] ?? 'mintspace2.testnet',
+          factoryContractId: config.keys.mbContractV2,
           name: req.body.contractName ?? '',
           ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? '',
           metadata: {
@@ -21,7 +21,19 @@ export async function postContract(req: Request, res: Response) {
         })
     )
 
-    console.log("response", response);
+    console.log("response", deployResponse);
+
+    const storageResponse = await execute(
+      {account},
+      ftDepositStorage({
+        accountId: process.env["CONTRACT_ADDRESS"],
+        // @ts-ignore
+        ftContractAddress: config.keys.ftAddresses.usdc,
+      })
+    );
+
+    console.log("response", storageResponse);
+
   }
 
   handleDeployContract()
@@ -44,8 +56,9 @@ export async function postMetadata(req: Request, res: Response) {
           noReference: true,
           maxSupply: metadata.copies,
           price: metadata.price ?? 0,
-          // ftAddress: process.env["USDC_ADDRESS"],
-          // ftDecimals: 6,
+          // @ts-ignore
+          ftAddress: config.keys.ftAddresses.usdc,
+          ftDecimals: 6,
         })
     );
 
