@@ -1,15 +1,12 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 
-import config from "./config";
-// import { postPaymentIntent } from "./routes/payment-intent";
-// import { postStripeWebhook } from "./routes/stripe-webhook";
 import { postContract, postMetadata } from "./routes/admin";
-import { listProducts } from "./routes/products";
-import { postOrder }    from "./routes/orders";
-import { showProduct } from "./routes/product";
+import { listProducts, showProduct }  from "./routes/products";
+import { postOrder }                  from "./routes/orders";
+import config from "./config";
 
-// maybe switch to basic authentication in the future
+// TODO: switch to basic authentication in the future
 const validateKey = (req: Request, res: Response, next: NextFunction) => {
   const key = req.query.key as string;
   if (key === undefined || key !== process.env["ADMIN_ACCESS_KEY"]) {
@@ -25,11 +22,9 @@ app.get("/health", (_: Request, res: Response) => {
   res.status(200).send("Service is healthy");
 });
 
-// app.post("/payment-intent", express.json(), postPaymentIntent);
-// app.post("/stripe-webhook", express.text({ type: "*/*" }), postStripeWebhook);
 app.get("/product/:id", express.json(), showProduct);
-app.get("/products", express.json(), listProducts);
-app.post("/orders", express.json(), postOrder);
+app.get("/products",    express.json(), listProducts);
+app.post("/orders",     express.json(), postOrder);
 
 const adminRouter = express.Router();
 adminRouter.post("/contract", validateKey, express.json(), postContract);

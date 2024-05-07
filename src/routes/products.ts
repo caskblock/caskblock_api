@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { initAirtable, listPublishedProducts } from '../lib/airtable';
+import { initAirtable, listPublishedProducts, getProductData } from '../lib/airtable';
 
 export async function listProducts(req: Request, res: Response) {
   const base     = await initAirtable();
@@ -9,3 +9,16 @@ export async function listProducts(req: Request, res: Response) {
     products
   );
 }
+
+export async function showProduct(req: Request, res: Response) {
+
+  const productId = req.params.id;
+
+  const base      = await initAirtable();
+  const product   = await getProductData(base, productId);
+
+  res.status(200).send(
+    product
+  );
+}
+
