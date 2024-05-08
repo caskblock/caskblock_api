@@ -30,7 +30,7 @@ function buildProduct(record: any) {
     description: Description,
     copies: Supply,
     price: Price,
-    media: Image[0].url,
+    media: Image,
     metadataId: MetadataID
   };
 
