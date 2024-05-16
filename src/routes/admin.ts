@@ -44,18 +44,30 @@ export async function postMetadata(req: Request, res: Response) {
 
   const handleCreateMetadata = async (metadata: Product): Promise<string> => {
     const account  = await config.getActorAccount();
+
+    const {title, description, media, copies, price, distillerySlug} = metadata;
+
+    if (title === '' || description === '' || media === '' || copies === 0 || price === 0 || distillerySlug === '') {
+      delete metadata.metadataId;
+
+      res.status(422).send({
+        message: `Failed to create metadata, fields specified below must not be empty`,
+        metadata: metadata
+      });
+    }
+
     const response = await execute(
         {account},
         createMetadata({
           contractAddress: process.env["CONTRACT_ADDRESS"],
           metadata: {
-            title: metadata.title,
-            description: metadata.description,
-            media: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Google_Verified_Badge.svg/1200px-Google_Verified_Badge.svg.png'
+            title: title,
+            description: description,
+            media: media,
           },
           noReference: true,
-          maxSupply: metadata.copies,
-          price: metadata.price ?? 0,
+          maxSupply: copies,
+          price: price ?? 0,
           // @ts-ignore
           ftAddress: config.keys.ftAddresses.usdc,
           ftDecimals: 6,
@@ -81,7 +93,8 @@ export async function postMetadata(req: Request, res: Response) {
   const metadata   = await getProductData(base, productID)
   const metadataID = await handleCreateMetadata(metadata);
 
-  updateProductStatus(base, productID, metadataID);
+
+  updateProductStatus(base, productID, metadataID, metadata.distillerySlug as string);
 
   res.status(200).send({
     message: `Metadata created successfully for '${metadata.title}'`,
