@@ -69,7 +69,6 @@ function buildProduct(record: any) {
 function buildDestillery(record: any) {
   const { Name, Description, Slug, ImageCover, Status, Products } = record.fields;
 
-
   const hasProducts = Products && Products.length > 0;
 
   const distillery: Distillery = {
@@ -212,6 +211,13 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
       resolve(filteredProducts);
     });
   });
+}
+
+export async function getDistilleryData(base: any, distillerySlug: string): Promise<Distillery> {
+  const distilleries = await getDistilleriesData(base);
+
+  const distillery = distilleries.find((distillery: Distillery) => distillery.slug === distillerySlug);
+  return distillery as Distillery;
 }
 
 export async function getDistilleriesData(base: any): Promise<Distillery[]> {
