@@ -4,10 +4,6 @@ const PUBLISHED_PRODUCTS_KEY = 'published_products';
 const BURN_WINDOWS_KEYS = 'burn_windows';
 const DISTILLERIES_KEY = 'distilleries';
 
-function buildCacheKey(distillerySlug?: string) {
-  return PUBLISHED_PRODUCTS_KEY + (distillerySlug || '');
-}
-
 // Define interface for the record
 export interface Product {
   id?: string;
@@ -166,11 +162,17 @@ export async function getBurnWindows(base: any, metadataIds?: string[]): Promise
   });
 }
 
+
+const filterProductsByDistillerySlug = (products: Product[], distillerySlug: string) => {
+  return products.filter((product: Product) => product.distillerySlug === distillerySlug);
+}
+
 export async function getPublishedProductsData(base: any, distillerySlug?: string): Promise<Product[]> {
-  const cachedProducts = cache.get(buildCacheKey(distillerySlug));
+  const cachedProducts = cache.get(PUBLISHED_PRODUCTS_KEY);
 
   if (cachedProducts) {
-    return cachedProducts;
+    const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(cachedProducts, distillerySlug) : cachedProducts;
+    return filteredProducts;
   }
 
   return new Promise((resolve, reject) => {
@@ -204,9 +206,10 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
         return;
       }
 
-      cache.put(buildCacheKey(distillerySlug), publishedProducts);
+      cache.put(PUBLISHED_PRODUCTS_KEY);
 
-      resolve(publishedProducts);
+      const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(publishedProducts, distillerySlug) : publishedProducts;
+      resolve(filteredProducts);
     });
   });
 }
@@ -255,8 +258,7 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
     console.log('Record updated successfully');
 
     cache.del(BURN_WINDOWS_KEYS);
-    cache.del(buildCacheKey());
-    cache.del(buildCacheKey(distillerySlug))
+    cache.del(PUBLISHED_PRODUCTS_KEY);
   });
 }
 
