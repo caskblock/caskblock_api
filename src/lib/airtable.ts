@@ -116,10 +116,10 @@ const filterProductsWithMetadataIds = (burnWindows: BurnWindow[], metadataIds: s
 }
 
 export async function getBurnWindows(base: any, metadataIds?: string[]): Promise<Product[]> {
-  const cachedProducts = cache.get(BURN_WINDOWS_KEYS);
+  const cachedWindows = cache.get(BURN_WINDOWS_KEYS);
 
-  if (cachedProducts) {
-    return filterProductsWithMetadataIds(cachedProducts, metadataIds as string[]);
+  if (cachedWindows) {
+    return filterProductsWithMetadataIds(cachedWindows, metadataIds as string[]);
   }
 
   return new Promise((resolve, reject) => {
@@ -178,10 +178,6 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
     const publishedProducts: Product[] = [];
 
     const filter: Filter = { view: "Published" };
-
-    if (distillerySlug) {
-      filter['filterByFormula'] = `({DistillerySlug} = '${distillerySlug}')`
-    }
     
     base(process.env["AIRTABLE_PRODUCTS"]).select(
       filter
@@ -205,7 +201,7 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
         return;
       }
 
-      cache.put(PUBLISHED_PRODUCTS_KEY);
+      cache.put(PUBLISHED_PRODUCTS_KEY, publishedProducts);
 
       const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(publishedProducts, distillerySlug) : publishedProducts;
       resolve(filteredProducts);
@@ -251,7 +247,7 @@ export async function getDistilleriesData(base: any): Promise<Distillery[]> {
   });
 }
 
-export async function updateProductStatus(base: any, id: string, metadataID: string, distillerySlug: string): Promise<void> {
+export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
   base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
     Status: 'Published',
     MetadataID: metadataID
