@@ -93,8 +93,7 @@ export async function postMetadata(req: Request, res: Response) {
   const metadata   = await getProductData(base, productID)
   const metadataID = await handleCreateMetadata(metadata);
 
-
-  updateProductStatus(base, productID, metadataID, metadata.distillerySlug as string);
+  updateProductStatus(base, productID, metadataID);
 
   res.status(200).send({
     message: `Metadata created successfully for '${metadata.title}'`,
