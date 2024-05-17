@@ -28,7 +28,6 @@ app.get("/product/:id",                   express.json(), showProduct);
 
 app.get("/products/burn_windows",         express.json(), listBurnWindows);
 app.get("/products/:distillerySlug",      express.json(), listPublishedProducts);
-app.get("/products/burn_windows",         express.json(), listBurnWindows);
 app.get("/products",                      express.json(), listPublishedProducts);
 
 app.get("/distilleries/:distillerySlug",  express.json(), showDistillery);
