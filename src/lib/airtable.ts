@@ -232,7 +232,8 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
       return;
     }
     console.log('Record updated successfully');
-
+    
+    cache.del(DISTILLERIES_KEY);
     cache.del(BURN_WINDOWS_KEYS);
     cache.del(PUBLISHED_PRODUCTS_KEY);
   });
