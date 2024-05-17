@@ -111,54 +111,28 @@ export async function getProductData(base: any, id: string): Promise<Product> {
   })
 }
 
-const filterProductsWithMetadataIds = (burnWindows: BurnWindow[], metadataIds: string[]) => {
-  return burnWindows.filter((burnWindow: BurnWindow) => metadataIds.includes(burnWindow.metadataId as string) && burnWindow.metadataId !== '');
+const filterBurnWindowsWithMetadataIds = (burnWindows: BurnWindow[], metadataIds: string[]) => {
+  return burnWindows.filter((burnWindow: BurnWindow) => metadataIds.includes(burnWindow.metadataId as string));
 }
 
 export async function getBurnWindows(base: any, metadataIds?: string[]): Promise<Product[]> {
   const cachedWindows = cache.get(BURN_WINDOWS_KEYS);
 
   if (cachedWindows) {
-    return filterProductsWithMetadataIds(cachedWindows, metadataIds as string[]);
+    return filterBurnWindowsWithMetadataIds(cachedWindows, metadataIds as string[]);
   }
 
-  return new Promise((resolve, reject) => {
-    const products: Product[] = [];
+  const publishedProducts = await getPublishedProductsData(base);
 
-    const filter: Filter = { view: "All Products" };
-    
-    base(process.env["AIRTABLE_PRODUCTS"]).select(
-      filter
-    ).eachPage((page: any, fetchNextPage: any) => {
-      
-      page.forEach((record: any) => {
-        try {
-          products.push(buildProduct(record));
-        } catch (err) {
-          console.log('Error inside eachPage:', err)
-          return;
-        }
-      });
+  const burnWindows = publishedProducts.map((product: Product) => ({
+    metadataId: product.metadataId,
+    burnWindowStart: product.burnWindowStart,
+    burnWindowEnd: product.burnWindowEnd
+  }));
 
-      fetchNextPage();
-    }, (err: any) => {
-      if (err) {
-        console.error('Error fetching records:', err);
-        reject(err); // Reject the promise if there's an error
-        return;
-      }
+  cache.put(BURN_WINDOWS_KEYS, burnWindows);
 
-      const burnWindows = products.map((product: Product) => ({
-        metadataId: product.metadataId,
-        burnWindowStart: product.burnWindowStart,
-        burnWindowEnd: product.burnWindowEnd
-      }));
-
-      cache.put(BURN_WINDOWS_KEYS, burnWindows);
-
-      resolve(filterProductsWithMetadataIds(burnWindows, metadataIds as string[]));
-    });
-  });
+  return filterBurnWindowsWithMetadataIds(burnWindows, metadataIds as string[]);
 }
 
 
