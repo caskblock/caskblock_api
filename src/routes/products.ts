@@ -1,9 +1,23 @@
 import { Request, Response } from "express";
-import { initAirtable, listPublishedProducts, getProductData } from '../lib/airtable';
+import { initAirtable, getPublishedProductsData, getBurnWindows, getProductData} from '../lib/airtable';
 
-export async function listProducts(req: Request, res: Response) {
-  const base     = await initAirtable();
-  const products = await listPublishedProducts(base);
+export async function listPublishedProducts(req: Request, res: Response) {
+  const base                   = await initAirtable();
+  const distillerySlug: string = req.params.distillerySlug as string;
+
+  const products = await getPublishedProductsData(base, distillerySlug);
+
+  res.status(200).send(
+    products
+  );
+}
+
+export async function listBurnWindows(req: Request, res: Response) {
+  const base = await initAirtable();
+
+  const metadataIds = req.query.metadataIds as string[];
+
+  const products = await getBurnWindows(base, metadataIds);
 
   res.status(200).send(
     products
