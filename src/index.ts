@@ -3,7 +3,7 @@ import cors from "cors";
 
 import { postContract, postMetadata } from "./routes/admin";
 import { listPublishedProducts, listBurnWindows, showProduct }  from "./routes/products";
-import { listDistilleries } from "./routes/distillieries";
+import { listDistilleries, showDistillery } from "./routes/distillieries";
 
 import { postOrder }                  from "./routes/orders";
 import config from "./config";
@@ -24,14 +24,17 @@ app.get("/health", (_: Request, res: Response) => {
   res.status(200).send("Service is healthy");
 });
 
-app.get("/product/:id",              express.json(), showProduct);
+app.get("/product/:id",                   express.json(), showProduct);
 
-app.get("/products/burn_windows",    express.json(), listBurnWindows);
-app.get("/products/:distillerySlug", express.json(), listPublishedProducts);
-app.get("/products/burn_windows",    express.json(), listBurnWindows);
-app.get("/products",                 express.json(), listPublishedProducts);
+app.get("/products/burn_windows",         express.json(), listBurnWindows);
+app.get("/products/:distillerySlug",      express.json(), listPublishedProducts);
+app.get("/products/burn_windows",         express.json(), listBurnWindows);
+app.get("/products",                      express.json(), listPublishedProducts);
 
-app.get("/distilleries",             express.json(), listDistilleries);
+app.get("/distilleries/:distillerySlug",  express.json(), showDistillery);
+app.get("/distilleries",                  express.json(), listDistilleries);
+
+
 
 app.post("/orders", express.json(), postOrder);
 
