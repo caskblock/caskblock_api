@@ -47,7 +47,7 @@ export function initAirtable() {
   return new Airtable({ apiKey: process.env["AIRTABLE_API_KEY"] }).base(process.env["AIRTABLE_BASE_ID"] || '');
 }
 
-function buildProduct(record: any) {  
+function buildProduct(record: any) {
   const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd} = record.fields;
 
   const metadata: Product = {
@@ -152,7 +152,7 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
     const publishedProducts: Product[] = [];
 
     const filter: Filter = { view: "Published" };
-    
+
     base(process.env["AIRTABLE_PRODUCTS"]).select(
       filter
     ).eachPage((page: any, fetchNextPage: any) => {
@@ -164,7 +164,7 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
           }
         } catch (err) {
           console.log('Error inside eachPage:', err)
-        } 
+        }
       });
 
       fetchNextPage();
@@ -215,16 +215,17 @@ export async function getDistilleriesData(base: any): Promise<Distillery[]> {
       }
 
       cache.put(DISTILLERIES_KEY, distilleries);
-      
+
       resolve(distilleries);
     });
   });
 }
 
-export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
+export async function updateProductStatus(base: any, id: string, metadataID: string, ipfsHash: string): Promise<void> {
   base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
-    Status: 'Published',
-    MetadataID: metadataID
+    Status:     'Published',
+    MetadataID: metadataID,
+    IPFSHash:   ipfsHash
 
   }, (err: any) => {
     if (err) {
@@ -235,6 +236,7 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
 
     cache.del(BURN_WINDOWS_KEYS);
     cache.del(PUBLISHED_PRODUCTS_KEY);
+    cache.del(DISTILLERIES_KEY);
   });
 }
 
