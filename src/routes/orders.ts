@@ -1,15 +1,28 @@
 import { Request, Response } from "express";
-import { createOrder, initAirtable } from '../lib/airtable';
+import { createOrder, initAirtable, updateOrder } from '../lib/airtable';
 
 export async function postOrder(req: Request, res: Response) {
 
   const base = await initAirtable();
 
-  const { tokenID, name, email, walletAddress, transactionHx } = req.body;
+  const { tokenId, walletAddress, name, surname, email, idCard, vat, propertyName, propertyVat, address, country } = req.body;
 
-  const order = await createOrder(base, tokenID, name, email, walletAddress, transactionHx);
+  const orderId = await createOrder(base, tokenId, walletAddress, name, surname, email, idCard, vat, propertyName, propertyVat, address, country);
+  res.status(200).send(
+    {orderId: orderId}
+  );
+};
+
+export async function putOrder(req: Request, res: Response) {
+
+  const base = await initAirtable();
+
+  const { orderId } = req.params;
+  const { transactionHx } = req.body;
+
+  const order = await updateOrder(base, orderId, transactionHx);
 
   res.status(200).send(
     order
   );
-}
+};

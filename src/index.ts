@@ -5,7 +5,7 @@ import { postContract, postMetadata } from "./routes/admin";
 import { listPublishedProducts, listBurnWindows, showProduct }  from "./routes/products";
 import { listDistilleries, showDistillery } from "./routes/distillieries";
 
-import { postOrder }                  from "./routes/orders";
+import { postOrder, putOrder } from "./routes/orders";
 import config from "./config";
 
 // TODO: switch to basic authentication in the future
@@ -33,8 +33,7 @@ app.get("/products",                      express.json(), listPublishedProducts)
 app.get("/distilleries/:distillerySlug",  express.json(), showDistillery);
 app.get("/distilleries",                  express.json(), listDistilleries);
 
-
-
+app.put("/orders/:orderId", express.json(), putOrder);
 app.post("/orders", express.json(), postOrder);
 
 const adminRouter = express.Router();
