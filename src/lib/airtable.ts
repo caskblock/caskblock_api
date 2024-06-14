@@ -20,6 +20,7 @@ export interface Product {
   distillerySlug?: string;
   burnWindowStart?: string;
   burnWindowEnd?: string;
+  productType?: string;
 }
 
 export interface Distillery {
@@ -48,7 +49,7 @@ export function initAirtable() {
 }
 
 function buildProduct(record: any) {
-  const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd} = record.fields;
+  const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd, ProductType} = record.fields;
 
   const metadata: Product = {
     id: record.id,
@@ -61,6 +62,7 @@ function buildProduct(record: any) {
     distillerySlug: DistillerySlug && DistillerySlug.length > 0 ? DistillerySlug[0] : '',
     burnWindowStart: BurnWindowStart || '',
     burnWindowEnd: BurnWindowEnd || '',
+    productType: ProductType || '',
   };
 
   return metadata;
@@ -240,18 +242,51 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
   });
 }
 
-export async function createOrder(base: any, tokenID: string, name: string, email: string, walletAddress: string, transactionHx: string): Promise<void> {
-  base(process.env["AIRTABLE_ORDERS"]).create({
-    TokenID: tokenID,
-    Name: name,
-    Email: email,
-    WalletAddress: walletAddress,
-    TransactionHx: transactionHx,
+export async function createOrder(base: any, tokenId: string, walletAddress: string, name: string, surname: string, email: string, idCard: string, vat: string, propertyName: string, propertyVat: string, address: string, country: string): Promise<void> {
+  try {
+    const requiredFields = [name, surname, email, idCard, vat, propertyName, propertyVat, address, country];
+
+    if (requiredFields.some(field => !field || field.trim() === "")) {
+      throw new Error('Missing required parameters');
+    }
+
+    const metadataId = tokenId.split(':')[0];
+
+    const cachedProducts = cache.get(PUBLISHED_PRODUCTS_KEY);
+    const product = cachedProducts.find((product: Product) => product.metadataId === metadataId);
+    const productType = product?.productType;
+
+    const record = await base(process.env["AIRTABLE_ORDERS"]).create({
+      TokenID: tokenId,
+      WalletAddress: walletAddress,
+      Name: name,
+      Surname: surname,
+      Email: email,
+      IDCard: idCard,
+      VAT: vat,
+      PropertyName: propertyName,
+      PropertyVAT: propertyVat,
+      Address: address,
+      Country: country,
+      ProductType: productType,
+    });
+
+    console.log('Record created successfully:', record.id);
+    return record.id;
+  } catch (err) {
+    console.error('Error creating record:', err);
+    return;
+  }
+}
+
+export async function updateOrder(base: any, orderId: string, transactionHx: string): Promise<void> {
+  base(process.env["AIRTABLE_ORDERS"]).update(orderId, {
+    TransactionHx: transactionHx
   }, (err: any) => {
     if (err) {
-      console.error('Error creating record:', err);
+      console.error('Error updating record:', err);
       return;
     }
-    console.log('Record created successfully');
+    console.log('Record updated successfully');
   });
 }
