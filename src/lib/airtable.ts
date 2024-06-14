@@ -12,15 +12,18 @@ export interface Product {
   media?: string;
   price?: number;
   copies?: number;
-  issued_at?: string;
-  expires_at?: string;
-  starts_at?: string;
   status?: string;
   metadataId?: string;
   distillerySlug?: string;
   burnWindowStart?: string;
   burnWindowEnd?: string;
   productType?: string;
+  country?: string;
+  brand?: string;
+  cask?: string;
+  style?: string;
+  alcohol?: string;
+  volume?: string;
 }
 
 export interface Distillery {
@@ -49,7 +52,8 @@ export function initAirtable() {
 }
 
 function buildProduct(record: any) {
-  const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd, ProductType} = record.fields;
+  const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd,
+          ProductType, Country, Brand, Cask, Style, Alcohol, Volume } = record.fields;
 
   const metadata: Product = {
     id: record.id,
@@ -63,6 +67,12 @@ function buildProduct(record: any) {
     burnWindowStart: BurnWindowStart || '',
     burnWindowEnd: BurnWindowEnd || '',
     productType: ProductType || '',
+    country: Country || '',
+    brand: Brand || '',
+    cask: Cask || '',
+    style: Style || '',
+    alcohol: Alcohol || '',
+    volume: Volume || '',
   };
 
   return metadata;

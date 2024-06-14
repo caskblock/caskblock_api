@@ -48,7 +48,7 @@ export async function postMetadata(req: Request, res: Response) {
 
     const {title, description, media, copies, price, distillerySlug} = metadata;
 
-    if (title === '' || description === '' || media === '' || copies === 0 || price === 0 || distillerySlug === '') {
+    if (title === '' || description === '' || media === '' || copies === 0 || price === 0) {
       delete metadata.metadataId;
 
       res.status(422).send({
