@@ -233,11 +233,10 @@ export async function getDistilleriesData(base: any): Promise<Distillery[]> {
   });
 }
 
-export async function updateProductStatus(base: any, id: string, metadataID: string, ipfsHash: string): Promise<void> {
+export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
   base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
-    Status:     'Published',
-    MetadataID: metadataID,
-    IPFSHash:   ipfsHash
+    Status: 'Published',
+    MetadataID: metadataID
 
   }, (err: any) => {
     if (err) {
@@ -248,7 +247,6 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
 
     cache.del(BURN_WINDOWS_KEYS);
     cache.del(PUBLISHED_PRODUCTS_KEY);
-    cache.del(DISTILLERIES_KEY);
   });
 }
 
