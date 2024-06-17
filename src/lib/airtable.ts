@@ -289,7 +289,8 @@ export async function createOrder(base: any, tokenId: string, walletAddress: str
 
 export async function updateOrder(base: any, orderId: string, transactionHx: string): Promise<void> {
   base(process.env["AIRTABLE_ORDERS"]).update(orderId, {
-    TransactionHx: transactionHx
+    TransactionHx: transactionHx,
+    DocusignStatus: 'New'
   }, (err: any) => {
     if (err) {
       console.error('Error updating record:', err);
