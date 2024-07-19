@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { execute, createMetadata, deployContract, ftDepositStorage } from '@mintbase-js/sdk';
 import { Product, initAirtable, getProductData, updateProductStatus } from '../lib/airtable';
+import { uploadToIPFS } from "../lib/pinata";
 import config from "../config";
 
 // export async function postContract(req: Request, res: Response) {
@@ -47,7 +48,7 @@ import config from "../config";
 
 export async function postMetadata(req: Request, res: Response) {
 
-  const handleCreateMetadata = async (metadata: Product): Promise<string> => {
+  const handleCreateMetadata = async (metadata: Product, ipfsHash: string): Promise<string> => {
     const account  = await config.getActorAccount();
 
     const {title, description, media, copies, price, distillerySlug} = metadata;
@@ -69,8 +70,8 @@ export async function postMetadata(req: Request, res: Response) {
             title: title,
             description: description,
             media: media,
+            reference: 'https://ipfs.io/ipfs/' + ipfsHash,
           },
-          noReference: true,
           maxSupply: copies,
           price: price ?? 0,
           // @ts-ignore
@@ -96,9 +97,10 @@ export async function postMetadata(req: Request, res: Response) {
   const productID  = req.query.productID as string;
   const base       = await initAirtable();
   const metadata   = await getProductData(base, productID)
-  const metadataID = await handleCreateMetadata(metadata);
+  const ipfsHash   = await uploadToIPFS(metadata);
+  const metadataID = await handleCreateMetadata(metadata, ipfsHash);
 
-  updateProductStatus(base, productID, metadataID);
+  updateProductStatus(base, productID, metadataID, ipfsHash);
 
   res.status(200).send({
     message: `Metadata created successfully for '${metadata.title}'`,

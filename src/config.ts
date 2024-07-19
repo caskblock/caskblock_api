@@ -53,8 +53,6 @@ export const config = (() => {
   return {
     port: parseInt(portEnv),
     keys: mbjs.keys,
-    // stripe: new Stripe(stripeSecretKey, { apiVersion: "2023-10-16" }),
-    // stripeWebhookSecret,
     getActorAccount: async () =>
       connect(actorAccountId, actorSecretKey, nearNetwork)
   };

@@ -24,6 +24,7 @@ export interface Product {
   style?: string;
   alcohol?: string;
   volume?: string;
+  tokenWarrant?: string;
 }
 
 export interface Distillery {
@@ -53,7 +54,7 @@ export function initAirtable() {
 
 function buildProduct(record: any) {
   const { Name, Description, Price, Supply, Image, MetadataID, DistillerySlug, BurnWindowStart, BurnWindowEnd,
-          ProductType, Country, Brand, Cask, Style, Alcohol, Volume } = record.fields;
+          ProductType, Country, Brand, Cask, Style, Alcohol, Volume, TokenWarrant } = record.fields;
 
   const metadata: Product = {
     id: record.id,
@@ -73,6 +74,7 @@ function buildProduct(record: any) {
     style: Style || '',
     alcohol: Alcohol || '',
     volume: Volume || '',
+    tokenWarrant: TokenWarrant || '',
   };
 
   return metadata;
@@ -233,10 +235,11 @@ export async function getDistilleriesData(base: any): Promise<Distillery[]> {
   });
 }
 
-export async function updateProductStatus(base: any, id: string, metadataID: string): Promise<void> {
+export async function updateProductStatus(base: any, id: string, metadataID: string, ipfsHash: string): Promise<void> {
   base(process.env["AIRTABLE_PRODUCTS"]).update(id, {
-    Status: 'Published',
-    MetadataID: metadataID
+    Status:     'Published',
+    MetadataID: metadataID,
+    IPFSHash:   ipfsHash
 
   }, (err: any) => {
     if (err) {
@@ -247,6 +250,7 @@ export async function updateProductStatus(base: any, id: string, metadataID: str
 
     cache.del(BURN_WINDOWS_KEYS);
     cache.del(PUBLISHED_PRODUCTS_KEY);
+    cache.del(DISTILLERIES_KEY);
   });
 }
 
