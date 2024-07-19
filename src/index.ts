@@ -1,7 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from "express";
 import cors from "cors";
 
-import { postContract, postMetadata } from "./routes/admin";
+import { postMetadata } from "./routes/admin";
 import { listPublishedProducts, listBurnWindows, showProduct }  from "./routes/products";
 import { listDistilleries, showDistillery } from "./routes/distillieries";
 
@@ -37,7 +37,7 @@ app.put("/orders/:orderId", express.json(), putOrder);
 app.post("/orders", express.json(), postOrder);
 
 const adminRouter = express.Router();
-adminRouter.post("/contract", validateKey, express.json(), postContract);
+// adminRouter.post("/contract", validateKey, express.json(), postContract);
 adminRouter.get("/metadata", validateKey, express.json(), postMetadata);
 app.use("/" + process.env["ADMIN_PATH"], adminRouter);
 

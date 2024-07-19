@@ -44,8 +44,6 @@ function readEnvVar(name: string): string {
 }
 
 export const config = (() => {
-  // const stripeSecretKey = readEnvVar("STRIPE_SECRET_KEY");
-  // const stripeWebhookSecret = readEnvVar("STRIPE_WEBHOOK_SECRET");
   const actorAccountId = readEnvVar("ACTOR_ACCOUNT_ID");
   const actorSecretKey = readEnvVar("ACTOR_SECRET_KEY");
   const nearNetwork = readEnvVar("NEAR_NETWORK");

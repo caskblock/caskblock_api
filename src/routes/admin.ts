@@ -3,42 +3,47 @@ import { execute, createMetadata, deployContract, ftDepositStorage } from '@mint
 import { Product, initAirtable, getProductData, updateProductStatus } from '../lib/airtable';
 import config from "../config";
 
-export async function postContract(req: Request, res: Response) {
+// export async function postContract(req: Request, res: Response) {
 
-  const handleDeployContract = async (): Promise<void> => {
+//   const handleDeployContract = async (): Promise<void> => {
 
-    const account = await config.getActorAccount();
+//     const account = await config.getActorAccount();
+//     const contractName = process.env["CONTRACT_ADDRESS"] ?
+//                             process.env["CONTRACT_ADDRESS"].split('.')[0] :
+//                             '';
 
-    const deployResponse = await execute(
-        {account},
-        deployContract({
-          factoryContractId: config.keys.mbContractV2,
-          name: req.body.contractName ?? '',
-          ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? '',
-          metadata: {
-              symbol: ""
-          }
-        })
-    )
+//     console.log('contractName:',contractName);
 
-    console.log("response", deployResponse);
+//     const deployResponse = await execute(
+//         {account},
+//         deployContract({
+//           factoryContractId: config.keys.mbContractV2,
+//           name: contractName,
+//           ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? '',
+//           metadata: {
+//               symbol: "CASK"
+//           }
+//         })
+//     )
 
-    const storageResponse = await execute(
-      {account},
-      ftDepositStorage({
-        accountId: process.env["CONTRACT_ADDRESS"],
-        // @ts-ignore
-        ftContractAddress: config.keys.ftAddresses.usdc,
-      })
-    );
+//     console.log("DEPLOY", deployResponse);
 
-    console.log("response", storageResponse);
+//     const storageResponse = await execute(
+//       {account},
+//       ftDepositStorage({
+//         accountId: process.env["CONTRACT_ADDRESS"],
+//         // @ts-ignore
+//         ftContractAddress: config.keys.ftAddresses.usdc,
+//       })
+//     );
 
-  }
+//     console.log("STORAGE", storageResponse);
 
-  handleDeployContract()
-  res.status(200).send();
-}
+//   }
+
+//   handleDeployContract()
+//   res.status(200).send();
+// }
 
 export async function postMetadata(req: Request, res: Response) {
 
