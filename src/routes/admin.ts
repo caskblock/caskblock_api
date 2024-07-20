@@ -51,9 +51,9 @@ export async function postMetadata(req: Request, res: Response) {
   const handleCreateMetadata = async (metadata: Product, ipfsHash: string): Promise<string> => {
     const account  = await config.getActorAccount();
 
-    const {title, description, media, copies, price, distillerySlug} = metadata;
+    const {title, description, media, copies, price, tokenWarrant} = metadata;
 
-    if (title === '' || description === '' || media === '' || copies === 0 || price === 0) {
+    if (title === '' || description === '' || media === '' || copies === 0 || price === 0 || tokenWarrant === '') {
       delete metadata.metadataId;
 
       res.status(422).send({
