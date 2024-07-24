@@ -32,7 +32,7 @@ import config from "../config";
 //     const storageResponse = await execute(
 //       {account},
 //       ftDepositStorage({
-//         accountId: process.env["CONTRACT_ADDRESS"],
+//         accountId: process.env["ACTOR_ACCOUNT_ID"],
 //         // @ts-ignore
 //         ftContractAddress: config.keys.ftAddresses.usdc,
 //       })
