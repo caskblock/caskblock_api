@@ -4,47 +4,52 @@ import { Product, initAirtable, getProductData, updateProductStatus } from '../l
 import { uploadToIPFS } from "../lib/pinata";
 import config from "../config";
 
-// export async function postContract(req: Request, res: Response) {
+export async function postContract(req: Request, res: Response) {
 
-//   const handleDeployContract = async (): Promise<void> => {
+  const handleDeployContract = async (): Promise<void> => {
 
-//     const account = await config.getActorAccount();
-//     const contractName = process.env["CONTRACT_ADDRESS"] ?
-//                             process.env["CONTRACT_ADDRESS"].split('.')[0] :
-//                             '';
+    const account = await config.getActorAccount();
+    const contractName = process.env["CONTRACT_ADDRESS"] ?
+                            process.env["CONTRACT_ADDRESS"].split('.')[0] :
+                            '';
 
-//     console.log('contractName:',contractName);
+    console.log('contractName:',contractName);
 
-//     const deployResponse = await execute(
-//         {account},
-//         deployContract({
-//           factoryContractId: config.keys.mbContractV2,
-//           name: contractName,
-//           ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? '',
-//           metadata: {
-//               symbol: "CASK"
-//           }
-//         })
-//     )
+    const deployResponse = await execute(
+        {account},
+        deployContract({
+          factoryContractId: config.keys.mbContractV2,
+          name: contractName,
+          ownerId: process.env["ACTOR_ACCOUNT_ID"] ?? '',
+          metadata: {
+              symbol: "CASK"
+          }
+        })
+    )
 
-//     console.log("DEPLOY", deployResponse);
+    console.log("DEPLOY", deployResponse);
+  }
 
-//     const storageResponse = await execute(
-//       {account},
-//       ftDepositStorage({
-//         accountId: process.env["ACTOR_ACCOUNT_ID"],
-//         // @ts-ignore
-//         ftContractAddress: config.keys.ftAddresses.usdc,
-//       })
-//     );
+  const handleDepositStorage = async (): Promise<void> => {
 
-//     console.log("STORAGE", storageResponse);
+    const account = await config.getActorAccount();
+    const storageResponse = await execute(
+      {account},
+      ftDepositStorage({
+        accountId: process.env["ACTOR_ACCOUNT_ID"],
+        // @ts-ignore
+        ftContractAddress: config.keys.ftAddresses.usdc,
+      })
+    );
 
-//   }
+    console.log("STORAGE", storageResponse);
 
-//   handleDeployContract()
-//   res.status(200).send();
-// }
+  }
+
+  // handleDeployContract();
+  handleDepositStorage();
+  res.status(200).send();
+}
 
 export async function postMetadata(req: Request, res: Response) {
 

@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@mintbase-js/data": "0.5.0-beta.8",
-    "@mintbase-js/sdk": "0.6.0-beta.10",
+    "@mintbase-js/sdk": "0.6.6-beta-prerelease.1",
     "@pinata/sdk": "^2.1.0",
     "airtable": "^0.12.2",
     "bn.js": "^5.2.1",
