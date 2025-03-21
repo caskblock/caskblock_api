@@ -3,6 +3,8 @@ var cache = require('memory-cache');
 const PUBLISHED_PRODUCTS_KEY = 'published_products';
 const BURN_WINDOWS_KEYS = 'burn_windows';
 const DISTILLERIES_KEY = 'distilleries';
+const fs = require('fs');
+const { parse } = require('csv-parse/sync');
 
 // Define interface for the record
 export interface Product {
@@ -101,28 +103,12 @@ function buildDestillery(record: any) {
 export async function getProductData(base: any, id: string): Promise<Product> {
   const cachedProducts = cache.get(PUBLISHED_PRODUCTS_KEY);
 
-  if (cachedProducts) {
-    return cachedProducts.find((product: Product) => product.id === id);
+  if (!cachedProducts) {
+    const publishedProducts = await getPublishedProductsData(base);
+    return publishedProducts.find((product: Product) => product.id === id) || {} as Product;
   }
 
-  return new Promise((resolve, reject) => {
-    base(process.env["AIRTABLE_PRODUCTS"]).find(id, (err: any, record : any) => {
-      if (err) {
-        console.error('Error querying record:', err);
-        return;
-      }
-
-      if (record) {
-        const metadata: Product = buildProduct(record);
-        resolve(metadata); // Return metadata;
-
-      } else {
-        console.error('Record not found');
-        reject(new Error('Record not found'));
-      }
-    });
-
-  })
+  return cachedProducts.find((product: Product) => product.id === id) || {} as Product;
 }
 
 const filterBurnWindowsWithMetadataIds = (burnWindows: BurnWindow[], metadataIds: string[]) => {
@@ -162,39 +148,63 @@ export async function getPublishedProductsData(base: any, distillerySlug?: strin
     return filteredProducts;
   }
 
-  return new Promise((resolve, reject) => {
-    const publishedProducts: Product[] = [];
+  try {
+    const fileContent = await fs.promises.readFile('src/data/products.csv', 'utf-8');
 
-    const filter: Filter = { view: "Published" };
-
-    base(process.env["AIRTABLE_PRODUCTS"]).select(
-      filter
-    ).eachPage((page: any, fetchNextPage: any) => {
-
-      page.forEach((record: any) => {
-        try {
-          if (record.fields.Status === 'Published') {
-            publishedProducts.push(buildProduct(record));
-          }
-        } catch (err) {
-          console.log('Error inside eachPage:', err)
-        }
-      });
-
-      fetchNextPage();
-    }, (err: any) => {
-      if (err) {
-        console.error('Error fetching records:', err);
-        reject(err); // Reject the promise if there's an error
-        return;
-      }
-
-      cache.put(PUBLISHED_PRODUCTS_KEY, publishedProducts);
-
-      const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(publishedProducts, distillerySlug) : publishedProducts;
-      resolve(filteredProducts);
+    // Use the synchronous parse function
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true
     });
-  });
+
+    const publishedProducts = records
+      .filter((record: any) => record.Status === 'Published')
+      .map((record: any) => buildProduct({ fields: record }));
+
+    cache.put(PUBLISHED_PRODUCTS_KEY, publishedProducts);
+
+    const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(publishedProducts, distillerySlug) : publishedProducts;
+    return filteredProducts;
+
+  } catch (err) {
+    console.error('Error reading or parsing CSV:', err);
+    throw err;
+  }
+
+  // return new Promise((resolve, reject) => {
+  //   const publishedProducts: Product[] = [];
+
+  //   const filter: Filter = { view: "Published" };
+  //   console.log('process.env["AIRTABLE_PRODUCTS"]:',process.env["AIRTABLE_PRODUCTS"]);
+
+  //   base(process.env["AIRTABLE_PRODUCTS"]).select(
+  //     filter
+  //   ).eachPage((page: any, fetchNextPage: any) => {
+
+  //     page.forEach((record: any) => {
+  //       try {
+  //         if (record.fields.Status === 'Published') {
+  //           publishedProducts.push(buildProduct(record));
+  //         }
+  //       } catch (err) {
+  //         console.log('Error inside eachPage:', err)
+  //       }
+  //     });
+
+  //     fetchNextPage();
+  //   }, (err: any) => {
+  //     if (err) {
+  //       console.error('Error fetching records:', err);
+  //       reject(err); // Reject the promise if there's an error
+  //       return;
+  //     }
+
+  //     cache.put(PUBLISHED_PRODUCTS_KEY, publishedProducts);
+
+  //     const filteredProducts = distillerySlug ? filterProductsByDistillerySlug(publishedProducts, distillerySlug) : publishedProducts;
+  //     resolve(filteredProducts);
+  //   });
+  // });
 }
 
 export async function getDistilleryData(base: any, distillerySlug: string): Promise<Distillery> {
@@ -211,28 +221,46 @@ export async function getDistilleriesData(base: any): Promise<Distillery[]> {
     return cachedDistilleries;
   }
 
-  return new Promise((resolve, reject) => {
-    const distilleries: Distillery[] = [];
+  try {
+    const fileContent = await fs.promises.readFile('src/data/distilleries.csv', 'utf-8');
 
-    base(process.env["AIRTABLE_DISTILLERIES"]).select().eachPage((page: any, fetchNextPage: any) => {
-
-      page.forEach((record: any) => {
-        distilleries.push(buildDestillery(record));
-      });
-
-      fetchNextPage();
-    }, (err: any) => {
-      if (err) {
-        console.error('Error fetching records:', err);
-        reject(err); // Reject the promise if there's an error
-        return;
-      }
-
-      cache.put(DISTILLERIES_KEY, distilleries);
-
-      resolve(distilleries);
+    // Use the synchronous parse function
+    const records = parse(fileContent, {
+      columns: true,
+      skip_empty_lines: true
     });
-  });
+
+    const distilleries = records.map((record: any) => buildDestillery({ fields: record }));
+
+    cache.put(DISTILLERIES_KEY, distilleries);
+    return distilleries;
+  } catch (err) {
+    console.error('Error reading or parsing CSV:', err);
+    throw err;
+  }
+
+  // return new Promise((resolve, reject) => {
+  //   const distilleries: Distillery[] = [];
+
+  //   base(process.env["AIRTABLE_DISTILLERIES"]).select().eachPage((page: any, fetchNextPage: any) => {
+
+  //     page.forEach((record: any) => {
+  //       distilleries.push(buildDestillery(record));
+  //     });
+
+  //     fetchNextPage();
+  //   }, (err: any) => {
+  //     if (err) {
+  //       console.error('Error fetching records:', err);
+  //       reject(err); // Reject the promise if there's an error
+  //       return;
+  //     }
+
+  //     cache.put(DISTILLERIES_KEY, distilleries);
+
+  //     resolve(distilleries);
+  //   });
+  // });
 }
 
 export async function updateProductStatus(base: any, id: string, metadataID: string, ipfsHash: string): Promise<void> {
